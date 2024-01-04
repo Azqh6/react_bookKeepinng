@@ -1,7 +1,9 @@
 import classNames from 'classnames'
 import './index.scss'
 import dayjs from 'dayjs'
-import {useMemo} from 'react'
+import {useMemo, useState} from 'react'
+import { billTypeToName } from '@/contants'
+import Icon from '@/components/Icon/Icon'
 
 const DailyBill = ({dailyList}) => {
     const dailyDate=dayjs(dailyList[0].date).format('MM-DD').split('-')
@@ -15,12 +17,14 @@ const DailyBill = ({dailyList}) => {
             result
         }
     },[dailyList])
+    //控制详细的展开
+    const [dailyItem,setDailyItem] = useState(false)
   return (
     <div className={classNames('dailyBill')}>
       <div className="header">
-        <div className="dateIcon">
+        <div className="dateIcon" onClick={()=>setDailyItem(!dailyItem)}>
           <span className="date">{dailyDate[0]+'月'+dailyDate[1]+'日'}</span>
-          <span className={classNames('arrow')}></span>
+          <span className={classNames('arrow',dailyItem && 'expand')}></span>
         </div>
         <div className="oneLineOverview">
           <div className="pay">
@@ -37,6 +41,25 @@ const DailyBill = ({dailyList}) => {
           </div>
         </div>
       </div>
+      {dailyItem && 
+      <div className="billList">
+      {dailyList.map(item => {
+        return (
+          <div className="bill" key={item.id}>
+            <Icon type={item.type}></Icon>
+            <div className="detail">
+              
+              <div className="billType">{billTypeToName[item.useFor] }</div>
+            </div>
+            <div className={classNames('money', item.type)}>
+              {item.money.toFixed(2)}
+            </div>
+          </div>
+        )
+      })}
+      </div>
+      }
+      
     </div>
   )
 }
